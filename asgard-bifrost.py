@@ -1,7 +1,7 @@
 import sys, os
 from argparse import ArgumentParser
 
-from asgard_sdk.format.print import print_error, print_info
+from asgard_sdk.format.print import print_error, print_info, print_success
 from asgard_sdk.server.server import AsgardServer
 from asgard_sdk.client.client import AsgardClient
 from asgard_sdk.models.file import LocalPath
@@ -151,3 +151,5 @@ if __name__ == "__main__":
         section = conn.create_section(section_name, remote_path, type)
         if section is None:
             print_error("Section already exists!", fatal=True)
+
+        print_success("Section Created: ", section.section_name)
