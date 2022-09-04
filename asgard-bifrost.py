@@ -22,13 +22,14 @@ def usage():
     print("     -f, --file QUERY : Query an Asgard server for file information")
     print("     -i, --index : List the file names of all files available")
     print("     -s, --search QUERY : Search the server for a file")
+    print("     -r, --register PATH : Register a file on asgard without uploading it")
+    print("     -S, --sections : List all sections on asgard")
     # print("     -u, --upload PATH : Upload a file to Asgard")
-    print("     -cS, --create-section [name] [remote_path] [type] : Create a new section in Asgard")
+    print("     -cS, --create-section NAME REMOTE_PATH TYPE : Create a new section in Asgard")
     print("Modifiers: ")
     print("     --section SECTION_NAME : Limit your search to a single search")
     print("     --direct : Directly connect to resources instead of using the REST api")
     print("     --full-models : Use full models instead of just file names for searching and indexing")
-    # print("     --skip-upload : Do everything except transfer the file")
 
 parser = ArgumentParser()
 
@@ -40,8 +41,10 @@ parser.add_argument("-f", "--file", action="store", type=str)
 parser.add_argument("-i", "--index", action="store_true")
 parser.add_argument("-s", "--search", action="store")
 parser.add_argument("-u", "--upload", action="store")
+parser.add_argument("-r", "--register", action="store")
+parser.add_argument("-S", "--sections", action="store_true")
 
-parser.add_argument("-cS", "--create-section", nargs=3, action="store", type=dict)
+parser.add_argument("-cS", "--create-section", nargs=3, action="store")
 
 parser.add_argument("--section", action="store", type=str)
 parser.add_argument("--direct", action="store_true")
@@ -137,10 +140,26 @@ if __name__ == "__main__":
 
         print("\nCounted {} items".format(len(search)))
 
-    if args.upload:
-        if args.skip_upload:
-            pass
+    if args.sections:
+        if section is None:
+            sections = conn.get_sections()
+            print_info("Sections")
+            for section in sections:
+                print("- {n} [{p}] ({s})".format(n=section.section_name, p=section.section_path, s=section.section_size))
+        else:
+            print_info("Section: ", section.section_name)
+            print("Name: ", section.section_name)
+            print("Path: ", section.section_path)
+            print("Type: ", section.section_type)
+            print("Size (bytes): ", section.section_size)
+            print("Total Downloads: ", section.total_downloads)
+            print("Total Uploads: ", section.total_uploads)
+            print("\nMongoDB Collection: ", section.mongo_collection)
+            print("Plex Section: ", section.plex_section)
 
+    if args.register:
+        pass
+    
     if args.create_section:
         args = args.create_section
 
