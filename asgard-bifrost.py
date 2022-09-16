@@ -17,7 +17,7 @@ def usage():
     print("Configuration: ")
     print("     -c, --config PATH : The path to your server files. Default is ", DEFAULT_CONFIG_PATH) # this needs to sorted out before initial commit
     print("     --server [server_name] : Choose a server to connect to. Your home server is used by default")
-    print("Interaction: ")
+    print("File Interaction: ")
     # print("     -v, --version : Print the server name and the version number")
     print("     -f, --file QUERY : Query an Asgard server for file information")
     print("     -i, --index : List the file names of all files available")
@@ -26,6 +26,12 @@ def usage():
     print("     -S, --sections : List all sections on asgard")
     # print("     -u, --upload PATH : Upload a file to Asgard")
     print("     -cS, --create-section NAME REMOTE_PATH TYPE : Create a new section in Asgard")
+    # print("Analytics: ")
+    # print("     -p, --popular : List popular files")
+    # print("     -rU, --recently-uploaded : List recently uploaded")
+    # print("     -rD, --recently-downloaded : List recently downloaded")
+    # print("     -f, --favorite QUERY : Favorite a file")
+    # print("     -F, --feature QUERY : Feature a file")
     print("Modifiers: ")
     print("     --section SECTION_NAME : Limit your search to a single search")
     print("     --direct : Directly connect to resources instead of using the REST api")
@@ -158,7 +164,17 @@ if __name__ == "__main__":
             print("Plex Section: ", section.plex_section)
 
     if args.register:
-        pass
+        local_path = LocalPath(args.register)
+        asgard_obj = conn.get_obj_from_local(local_path)
+
+        if section is None:
+            print_error("Need a section to register file in!", fatal=True)
+
+        file = conn.create_file(asgard_obj, section)
+        if file is None:
+            print_error("File type does not match section type", fatal=True)
+
+        print_success("File Registered: ", file.file_name)
     
     if args.create_section:
         args = args.create_section
