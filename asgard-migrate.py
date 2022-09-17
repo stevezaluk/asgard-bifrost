@@ -114,7 +114,7 @@ parser = ArgumentParser()
 
 parser.add_argument("--section", action="store", type=str, required=True)
 parser.add_argument("--server", action="store", type=str)
-parser.add_argument("--direct", action="store_true", type=bool, default=False)
+parser.add_argument("--direct", action="store_true", default=False)
 
 parser.add_argument("-f", "--file", action="store", type=str)
 parser.add_argument("-w", "--walk", action="store", type=str)
