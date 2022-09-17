@@ -121,14 +121,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     migrate = Migrate()
+    migrate.determine_connection()
 
     if args.section:
         migrate.choose_section(args.section)
 
     if args.server:
         migrate.determine_server(args.server)
-
-    migrate.determine_connection()
 
     if args.file:
         migrate.migrate_single(args.file)
