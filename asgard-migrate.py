@@ -114,6 +114,9 @@ parser = ArgumentParser()
 parser.add_argument("--section", action="store", type=str, required=True)
 parser.add_argument("--server", action="store", type=str)
 
+parser.add_argument("-f", "--file", action="store", type=str)
+parser.add_argument("-w", "--walk", action="store", type=str)
+
 if __name__ == "__main__":
     args = parser.parse_args()
     
@@ -127,7 +130,11 @@ if __name__ == "__main__":
 
     migrate.determine_connection()
 
+    if args.file:
+        migrate.migrate_single(args.file)
 
+    if args.walk:
+        migrate.migrate_bulk(args.walk)
     
 
 
