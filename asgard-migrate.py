@@ -94,7 +94,8 @@ class Migrate(object):
         inserted_object = self.connection.create_file(asgard_object, self.section)
 
         if inserted_object is None:
-            print_error("Cannot register file with type {ft} in section with type {st}".format(ft=asgard_object.file_type, st=self.section.section_type), fatal=True)
+            print_error("Cannot register file with type {ft} in section with type {st}".format(ft=asgard_object.file_type, st=self.section.section_type))
+            return
 
         print_success("File Registered")
         print("File Name: ", inserted_object.file_name)
@@ -133,11 +134,11 @@ if __name__ == "__main__":
         print_warning("This will deprecated in a later version when authentication is implemented")
         username = args.username
 
-    if args.section:
-        migrate.choose_section(args.section)
-
     if args.server:
         migrate.determine_server(args.server)
+
+    if args.section:
+        migrate.choose_section(args.section)
 
     if args.file:
         migrate.migrate_single(args.file, username)
