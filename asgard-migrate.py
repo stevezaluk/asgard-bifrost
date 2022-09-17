@@ -23,6 +23,7 @@ def usage():
     print("Modifiers: ")
     print("     --section [name] : Set your asgard section")
     print("     --server [name] : Choose a specific server")
+    print("     --direct : Directly connect to resources instead of using the REST-API")
 
 class Migrate(object):
     def __init__(self, direct=False):
@@ -113,6 +114,7 @@ parser = ArgumentParser()
 
 parser.add_argument("--section", action="store", type=str, required=True)
 parser.add_argument("--server", action="store", type=str)
+parser.add_argument("--direct", action="store_true", type=bool, default=False)
 
 parser.add_argument("-f", "--file", action="store", type=str)
 parser.add_argument("-w", "--walk", action="store", type=str)
@@ -120,7 +122,7 @@ parser.add_argument("-w", "--walk", action="store", type=str)
 if __name__ == "__main__":
     args = parser.parse_args()
     
-    migrate = Migrate()
+    migrate = Migrate(args.direct)
     migrate.determine_connection()
 
     if args.section:
