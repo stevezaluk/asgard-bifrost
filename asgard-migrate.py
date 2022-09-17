@@ -24,6 +24,7 @@ def usage():
     print("     --section [name] : Set your asgard section")
     print("     --server [name] : Choose a specific server")
     print("     --direct : Directly connect to resources instead of using the REST-API")
+    print("     --username [username] : Force a specific username to be logged in migration")
 
 class Migrate(object):
     def __init__(self, direct=False):
@@ -77,7 +78,7 @@ class Migrate(object):
     #     if plex_section is None:
     #         print_error("Failed to find plex_section: ", plex_section_name)
 
-    def migrate_single(self, path: str):
+    def migrate_single(self, path: str, username: str):
         local_path = LocalPath(path)
 
         print_info("Migration: ", path)
@@ -87,7 +88,7 @@ class Migrate(object):
         print_info("Creating Asgard object")
         asgard_object = self.connection.get_obj_from_local(local_path)
         asgard_object.file_location = self.section.section_path + "/" + local_path.file_name
-        asgard_object.set_upload_info()
+        asgard_object.set_upload_info(username)
 
         print_info("Registering file in database")
         inserted_object = self.connection.create_file(asgard_object, self.section)
@@ -100,7 +101,7 @@ class Migrate(object):
         print("File Size: ", inserted_object.file_size)
         print("SHA-256: ", inserted_object.file_sha)
     
-    def migrate_bulk(self, path: str):
+    def migrate_bulk(self, path: str, username: str):
         local_path = LocalPath(path)
         
         if local_path.type == "file":
@@ -115,6 +116,7 @@ parser = ArgumentParser()
 parser.add_argument("--section", action="store", type=str, required=True)
 parser.add_argument("--server", action="store", type=str)
 parser.add_argument("--direct", action="store_true", default=False)
+parser.add_argument("--username", action="store", type=str)
 
 parser.add_argument("-f", "--file", action="store", type=str)
 parser.add_argument("-w", "--walk", action="store", type=str)
@@ -125,6 +127,12 @@ if __name__ == "__main__":
     migrate = Migrate(args.direct)
     migrate.determine_connection()
 
+    username = "default-user"
+    if args.username:
+        print_warning("A user is being manually specified: ", args.username)
+        print_warning("This will deprecated in a later version when authentication is implemented")
+        username = args.username
+
     if args.section:
         migrate.choose_section(args.section)
 
@@ -132,10 +140,10 @@ if __name__ == "__main__":
         migrate.determine_server(args.server)
 
     if args.file:
-        migrate.migrate_single(args.file)
+        migrate.migrate_single(args.file, username)
 
     if args.walk:
-        migrate.migrate_bulk(args.walk)
+        migrate.migrate_bulk(args.walk, username)
     
 
 
