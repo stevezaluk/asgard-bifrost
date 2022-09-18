@@ -91,7 +91,7 @@ class Migrate(object):
         asgard_object.set_upload_info(username)
 
         print_info("Registering file in database")
-        inserted_object = self.connection.create_file(asgard_object, self.section)
+        inserted_object = self.connection.register_file(asgard_object, self.section)
 
         if inserted_object is None:
             print_error("Cannot register file with type {ft} in section with type {st}".format(ft=asgard_object.file_type, st=self.section.section_type))
