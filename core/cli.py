@@ -85,7 +85,7 @@ class CommandLine(object):
         print("SHA-256: ", file.file_sha)
 
         if file_type == "video":
-            print_info("\nVideo Information")
+            print_info("Video Information")
             print("Duration: ", file.duration)
             print("Format: ", file.format)
             print("Resoloution: ", file.resolution)
@@ -94,7 +94,7 @@ class CommandLine(object):
             print("Languages: ", file.language)
 
         if file_type == "document":
-            print_info("\nDocument Information")
+            print_info("Document Information")
             print("Title: ", file.title)
             print("Author: ", file.author)
             print("Page Count: ", file.page_count)
@@ -105,7 +105,7 @@ class CommandLine(object):
             print("Console: ", file.console)
             print("Region: ", file.region)
         
-        print_info("\nUpload Information")
+        print_info("Upload Information")
         print("Creation Date: ", file.creation_date)
         print("Uploaded Date: ", file.uploaded_date)
         print("Uploaded By: ", file.uploaded_by)
@@ -126,13 +126,21 @@ class CommandLine(object):
             print(" - ", file_name)
 
     def register_file(self, path: str):
-        local_path = LocalPath(path)
-        asgard_obj = self.connection.get_obj_from_local(local_path)
-
         if self.section is None:
             print_error("Need a section to register file in!", fatal=True)
+        
+        local_path = LocalPath(path)
+        
+        print_info("Register: ", path)
+        print_info("Generating SHA-256 check sum...")
+        local_path.get_sha()
+        
+        print("Creating AsgardObject...")
+        asgard_obj = self.connection.get_obj_from_local(local_path)
+        asgard_obj.file_location = self.section.section_path + "/" + local_path.file_name
 
-        file = self.connection.create_file(asgard_obj, self.section)
+        print_info("Registering file...")
+        file = self.connection.register_file(asgard_obj, self.section)
         if file is None:
             print_error("File type does not match section type", fatal=True)
 
