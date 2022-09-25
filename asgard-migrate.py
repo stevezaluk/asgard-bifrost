@@ -14,9 +14,9 @@ from asgard_sdk.format.print import *
 
 def usage():
     print("asgard-migrate - A script to help you migrate an existing archive of videos into asgard")
-    print("Plex Options")
-    print("     -pS [section] : Migrate a plex section into an asgard section")
-    print("     -pL : Migrate your entire plex library into asgard")
+    # print("Plex Options")
+    # print("     -pS [section] : Migrate a plex section into an asgard section")
+    # print("     -pL : Migrate your entire plex library into asgard")
     print("Local Options: ")
     print("     -w [path] : Walk a directory and insert its content into asgard")
     print("     -f [path] : Insert a single item into asgard")
@@ -69,25 +69,16 @@ class Migrate(object):
         if self.section is None:
             print_error("Failed to find section: ", section_name, fatal=True)
 
-    # def migrate_section(self, plex_section_name: str):
-    #     plex_section = None
-    #     for section in self.plex.sections:
-    #         if section.title == plex_section_name:
-    #             plex_section = section
-
-    #     if plex_section is None:
-    #         print_error("Failed to find plex_section: ", plex_section_name)
-
     def migrate_single(self, path: str, username: str):
+        print_info("Migration: ", path)
         local_path = LocalPath(path)
 
-        print_info("Migration: ", path)
         print_info("Generating SHA-256 checksum... ")
         local_path.get_sha()
+        local_path.file_location = self.section.section_path
 
         print_info("Creating Asgard object")
         asgard_object = self.connection.get_obj_from_local(local_path)
-        asgard_object.file_location = self.section.section_path + "/" + local_path.file_name
         asgard_object.set_upload_info(username)
 
         print_info("Registering file in database")
@@ -108,9 +99,13 @@ class Migrate(object):
         if local_path.type == "file":
             print_error("You must pass a directory path to do a bulk migrate", fatal=True)
         
-        for file_name in listdir(local_path.path):
-            file_name = local_path.path + file_name
-            self.migrate_single(file_name)
+        print_info("Bulk Migrate: ", path)
+        directory = listdir(local_path.path)
+        for file_name in directory:
+            file_name = local_path.path + "/" + file_name
+            self.migrate_single(file_name, username)
+
+        print("Counted Items: ", len(directory))
 
 parser = ArgumentParser()
 
@@ -127,6 +122,9 @@ if __name__ == "__main__":
     
     migrate = Migrate(args.direct)
     migrate.determine_connection()
+
+    if args.section:
+        migrate.choose_section(args.section)
 
     username = "default-user"
     if args.username:
