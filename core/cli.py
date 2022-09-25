@@ -58,6 +58,8 @@ class CommandLine(object):
             print_info("Sections: ")
             for section in sections:
                 print("- {n} [{p}] ({s})".format(n=section.section_name, p=section.section_path, s=section.section_size))
+            
+            print("Counted Items: ", len(sections))
         else:
             print_info("Section: ", self.section.section_name)
             print("Name: ", self.section.section_name)
@@ -118,12 +120,16 @@ class CommandLine(object):
         for file_name in index:
             print(" - ", file_name)
 
+        print("Counted Items: ", len(index))
+
     def search(self, query: str):
         search = self.connection.search(query, section=self.section, key="file_name")
 
         print_info("Searching for '{}' in file_name".format(query))
         for file_name in search:
             print(" - ", file_name)
+
+        print("\nCounted Items: ", len(search))
 
     def register_file(self, path: str):
         if self.section is None:
@@ -134,17 +140,20 @@ class CommandLine(object):
         print_info("Register: ", path)
         print_info("Generating SHA-256 check sum...")
         local_path.get_sha()
+        local_path.file_location = self.section.section_path + "/" + local_path.file_name
         
-        print("Creating AsgardObject...")
+        print_info("Creating AsgardObject...")
         asgard_obj = self.connection.get_obj_from_local(local_path)
-        asgard_obj.file_location = self.section.section_path + "/" + local_path.file_name
 
         print_info("Registering file...")
         file = self.connection.register_file(asgard_obj, self.section)
         if file is None:
             print_error("File type does not match section type", fatal=True)
 
-        print_success("File Registered: ", file.file_name)
+        print_success("File Registered")
+        print("File Name: ", file.file_name)
+        print("File Size: ", file.file_size)
+        print("SHA-256: ", file.file_sha)
 
     def create_section(self, section_name: str, remote_path: str, type: str):
         section = self.connection.create_section(section_name, remote_path, type)
