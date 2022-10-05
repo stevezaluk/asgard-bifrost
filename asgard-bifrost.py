@@ -30,7 +30,9 @@ def usage():
     print("Modifiers: ")
     print("     --section SECTION_NAME : Limit your search to a single search")
     print("     --direct : Directly connect to resources instead of using the REST api")
-    print("     --full-models : Use full models instead of just file names for searching and indexing")
+    print("     --hash-verity : Match a fresh sha-256 hash to the one stored in the database")
+    print("     --plex : Return plex metadata with a response")
+    print("     --key [key] : Print the value of a key from the JSON response")
 
 parser = ArgumentParser()
 
@@ -44,22 +46,38 @@ parser.add_argument("-s", "--search", action="store", type=str)
 # parser.add_argument("-u", "--upload", action="store")
 parser.add_argument("-r", "--register", action="store", type=str)
 parser.add_argument("-S", "--sections", action="store_true")
+parser.add_argument("-v", "--validate", action="store", type=str)
 
 parser.add_argument("-cS", "--create-section", nargs=3, action="store")
 
-parser.add_argument("--section", action="store", type=str)
 parser.add_argument("--direct", action="store_true", default=False)
-parser.add_argument("--full-models", action="store_true")
-parser.add_argument("--skip-upload", action="store_true")
+parser.add_argument("--key", action="store", default=None)
+parser.add_argument("--limit", action="store", default=15, type=int)
+parser.add_argument("--plex", action="store_true", default=False)
+parser.add_argument("--section", action="store", type=str)
+parser.add_argument("--hash-verity", action="store_true", default=False)
 
 if __name__ == "__main__":
     args = parser.parse_args()
 
-    cli = CommandLine(args.direct)
+    cli = CommandLine()
+    
+    if args.direct:
+        cli.direct = True
+    
     cli.determine_connection()
 
     if args.config:
         cli.determine_server(args.config)
+
+    if args.key:
+        cli.key = args.key
+    
+    if args.limit:
+        cli.limit = args.limit
+
+    if args.plex:
+        cli.plex = args.plex
 
     if args.section:
         cli.choose_section(args.section)

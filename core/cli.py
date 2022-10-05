@@ -19,6 +19,10 @@ class CommandLine(object):
         self.connection = None
         self.section = None
 
+        self.key = None
+        self.limit = 15
+        self.plex = False
+
         self.determine_server()
 
     def determine_connection(self):
@@ -47,14 +51,14 @@ class CommandLine(object):
             print_error("Failed to find home server. Use --server to specify one", fatal=True)
 
     def choose_section(self, section_name: str):
-        self.section = self.connection.get_section(section_name)
+        self.section = self.connection.get_section(section_name, key=self.key)
 
         if self.section is None:
             print_error("Failed to find section: ", section_name, fatal=True)
 
     def sections(self):
         if self.section is None:
-            sections = self.connection.get_sections()
+            sections = self.connection.get_sections(key=self.key, limit=self.limit)
             print_info("Sections: ")
             for section in sections:
                 print("- {n} [{p}] ({s})".format(n=section.section_name, p=section.section_path, s=section.section_size))
@@ -72,7 +76,7 @@ class CommandLine(object):
             print("Plex Section: ", self.section.plex_section)
 
     def file(self, query: str):
-        file = self.connection.get_file(query, self.section)
+        file = self.connection.get_file(query, self.section, key=self.key, plex=self.plex)
 
         if file is None:
             print_error("Failed to find file: ", query, fatal=True)
@@ -114,7 +118,12 @@ class CommandLine(object):
         print("Downloads: ", file.download_count)
 
     def index(self):
-        index = self.connection.index(self.section, key="file_name")
+        if self.key is None:
+            key = "file_name"
+        else:
+            key = self.key
+        
+        index = self.connection.index(self.section, key=key)
 
         print_info("Index")
         for file_name in index:
