@@ -63,7 +63,7 @@ class CommandLine(object):
             for section in sections:
                 print("- {n} [{p}] ({s})".format(n=section.section_name, p=section.section_path, s=section.section_size))
             
-            print("Counted Items: ", len(sections))
+            print("\nCounted Items: ", len(sections))
         else:
             print_info("Section: ", self.section.section_name)
             print("Name: ", self.section.section_name)
@@ -129,7 +129,7 @@ class CommandLine(object):
         for file_name in index:
             print(" - ", file_name)
 
-        print("Counted Items: ", len(index))
+        print("\nCounted Items: ", len(index))
 
     def search(self, query: str):
         search = self.connection.search(query, section=self.section, key="file_name")
