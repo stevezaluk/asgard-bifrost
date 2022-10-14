@@ -33,6 +33,7 @@ def usage():
     print("     --hash-verity : Match a fresh sha-256 hash to the one stored in the database")
     print("     --plex : Return plex metadata with a response")
     print("     --key [key] : Print the value of a key from the JSON response")
+    print("     --limit [int] : Set a limit for how many documents you return")
 
 parser = ArgumentParser()
 
@@ -98,6 +99,8 @@ if __name__ == "__main__":
         cli.register_file(args.register)
 
     if args.create_section:
+        args = args.create_section
+        
         section_name = args[0]
         remote_path = args[1]
         type = args[2]        
